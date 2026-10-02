@@ -1,0 +1,16 @@
+# Spotify OAuth token cache (spotipy) — contains access/refresh tokens
+.cache
+.cache-*
+
+# credentials
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+.DS_Store
