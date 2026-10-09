@@ -1,6 +1,6 @@
 # yt2spotify
 
-Turn a YouTube video with a tracklist (chapters or timestamps in the description) into a Spotify playlist on your account.
+Turn a YouTube mix video into a Spotify playlist on your account, using the video's Songs section and/or its tracklist (chapters, description timestamps, or a comment).
 
 ## Setup
 
@@ -29,10 +29,20 @@ python3 -m venv .venv
 
 First run opens a browser for Spotify login; token is cached in `.cache`.
 
-## Notes
+## Where songs come from
 
-- Uses YouTube chapters first, then timestamped description lines. If neither gives 3+ tracks, scans the top 200 comments and picks the one with the most timestamped lines (pinned/uploader comments preferred). `--comments` forces comment mode.
-- Expects `Artist - Title` per line. Title-only lines are matched using hashtags/tags on the video as artist hints (e.g. `#sza #frankocean`); if no hint matches, Spotify's top hit is used and marked `?` in the output.
+1. **Songs section** (the "Music" list YouTube shows under the description). Verified artist + title, so it always wins.
+2. **Tracklist**: chapters, then timestamped description lines, then the top 200 comments (pinned/uploader comments preferred). `--comments` forces comment mode.
+
+Tracklist lines naming a song from the Songs section are replaced by the verified entry. Songs-section songs missing from the tracklist are added at the end. `--songs-only` ignores tracklists entirely.
+
+## Matching
+
+- A Spotify result is only accepted if its **title matches** the requested one (ignoring things like `(feat. X)`, `(2020 Demo)`, `- Remastered`).
+- Title-only lines (no artist) also need the artist to match a hint: hashtags/tags on the video (e.g. `#sza #frankocean`) or artists from the Songs section.
+- Missed or unsure titles get a second search paired with each artist the video features (Songs section, artists already matched, hashtags), e.g. `Love` + `Kendrick Lamar` finds `LOVE.`. This fixes small typos and common titles, but not typos Spotify can't resolve.
+- If the title matches but the artist still can't be confirmed, the track is **left out** and listed as unsure. `--include-guesses` adds those too.
+- Duplicates (same song, even a different Spotify version) are skipped.
 - Unmatched tracks are listed at the end.
 
 ## License
